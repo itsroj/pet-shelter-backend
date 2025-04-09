@@ -9,6 +9,10 @@ const petSchema = new Schema({
         type: String,
         required: true,
     },
+    name: {
+        type: String,
+        required: true
+    },
     age: {
         type: String,
         required: true,
@@ -17,17 +21,23 @@ const petSchema = new Schema({
         type: String,
         enum: ["male", "female"],
         required: true,
-        
+    },
+    size: {
+        type: String,
+        enum: ["small", "medium", "big"]
     },
     description: {
         type: String,
         required: true,
     }, 
-
     image: {
         type: String,
         required: true,
-    }, 
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
 });
 const PetModel = model("pet", petSchema);
 module.exports = PetModel;
