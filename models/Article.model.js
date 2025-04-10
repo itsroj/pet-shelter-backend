@@ -5,7 +5,7 @@ const articleSchema = new Schema (
         image: { type: String },
         title: { type: String, required: true },
         description: { type: String, required: true },
-        author: { type: String }
+        author: { type: Schema.Types.ObjectId, ref:"user", required: true }
     }
 );
 
