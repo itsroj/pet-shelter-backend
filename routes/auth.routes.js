@@ -3,15 +3,18 @@ const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const UserModel = require("../models/User.model");
 const { isAuthenticated } = require("../middlewares/jwt.middleware");
+const uploader = require("../middlewares/cloudinary.middleware")
 
 // Route to create a user with a hashed password
-router.post("/signup", async (req, res) => {
+router.post("/signup", uploader.single("profileImage"), async (req, res) => {
   try {
+    console.log(req.body)
     const salt = bcryptjs.genSaltSync(12);
     const hashedPassword = bcryptjs.hashSync(req.body.password, salt);
     const hashedUser = {
       ...req.body,
       password: hashedPassword,
+      profileImage: req.file.path
     };
 
     const newUser = await UserModel.create(hashedUser);
@@ -44,7 +47,7 @@ router.post("/login", async (req, res) => {
         } else {
           //in this else block, the email exists and the password match
           //this the non secret data that we want to put into the jwt token
-          const data = { _id: foundUser._id, username: foundUser.username };
+          const data = { _id: foundUser._id, username: foundUser.username, role: foundUser.role };
           const authToken = jwt.sign(data, process.env.TOKEN_SECRET, {
             algorithm: "HS256",
             expiresIn: "6h",
