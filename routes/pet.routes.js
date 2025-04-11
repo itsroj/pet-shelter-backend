@@ -5,7 +5,7 @@ const uploader = require("../middlewares/cloudinary.middleware")
 //post to create a pet
 router.post("/create", uploader.single("image"), async (req, res) => {
   console.log("create pet req.body:", req.body)
-  PetModel.create(req.body)
+  PetModel.create({...req.body, image: req.file.path})
     .then((responseFromDB) => {
       console.log("pet created!", responseFromDB);
       res.status(201).json(responseFromDB);
