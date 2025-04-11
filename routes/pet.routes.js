@@ -1,8 +1,10 @@
 const router = require("express").Router();
 const PetModel = require("../models/Pet.model");
+const uploader = require("../middlewares/cloudinary.middleware")
 
 //post to create a pet
-router.post("/create", async (req, res) => {
+router.post("/create", uploader.single("image"), async (req, res) => {
+  console.log("create pet req.body:", req.body)
   PetModel.create(req.body)
     .then((responseFromDB) => {
       console.log("pet created!", responseFromDB);
