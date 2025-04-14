@@ -18,10 +18,10 @@ router.post("/create", uploader.single("image"), async (req, res) => {
 
 //route to get all pets
 router.get("/all-pets", async (req, res) => {
-  PetModel.find()
+  PetModel.find().populate("createdBy")
     // .populate("owner")
     .then((responseFromDB) => {
-      console.log("Here are all the pets", responseFromDB);
+      // console.log("Here are all the pets", responseFromDB);
       res.status(200).json({
         allPets: responseFromDB,
       });
@@ -44,8 +44,10 @@ router.get("/one-pet/:petId", async (req, res) => {
 });
 
 //update the pet title
-router.patch("/update-pet/:petId", (req, res) => {
-  PetModel.findByIdAndUpdate(req.params.petId, req.body, { new: true })
+router.patch("/update-pet/:petId", uploader.single("image"), (req, res) => {
+  console.log(req.file)
+  if (req.file) {
+    PetModel.findByIdAndUpdate(req.params.petId, {...req.body, image:req.file.path}, { new: true })
     //.populate("owner")
     .then((updatedPet) => {
       console.log("pet updated", updatedPet);
@@ -55,6 +57,18 @@ router.patch("/update-pet/:petId", (req, res) => {
       console.log(err);
       res.status(500).json({ errorMessage: "Trouble finding all the pets" });
     });
+  } else {
+    PetModel.findByIdAndUpdate(req.params.petId, req.body, { new: true })
+      //.populate("owner")
+      .then((updatedPet) => {
+        console.log("pet updated", updatedPet);
+        res.status(200).json(updatedPet);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({ errorMessage: "Trouble finding all the pets" });
+      });
+  }
 });
 
 //delete a pet

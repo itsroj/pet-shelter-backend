@@ -38,7 +38,7 @@ const petSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    createdBy: { type: Schema.Types.ObjectId, ref:"user", required: true }
+    createdBy: { type: Schema.Types.ObjectId, ref:"User", required: true }
 });
 const PetModel = model("pet", petSchema);
 module.exports = PetModel;
