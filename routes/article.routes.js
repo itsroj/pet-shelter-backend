@@ -1,9 +1,10 @@
 const router = require("express").Router();
 const ArticleModel = require("../models/Article.model");
+const uploader = require("../middlewares/cloudinary.middleware")
 
 //post to create a article
-router.post("/create", async (req, res) => {
-  ArticleModel.create(req.body)
+router.post("/create", uploader.single("image"), async (req, res) => {
+  ArticleModel.create({...req.body, image: req.file.path})
     .then((responseFromDB) => {
       console.log("article created!", responseFromDB);
       res.status(201).json(responseFromDB);
@@ -17,7 +18,7 @@ router.post("/create", async (req, res) => {
 //route to get all articles
 router.get("/all-articles", async (req, res) => {
   ArticleModel.find()
-    // .populate("owner")
+    .populate("author")
     .then((responseFromDB) => {
       console.log("Here are all the articles", responseFromDB);
       res.status(200).json({
@@ -37,13 +38,14 @@ router.get("/one-article/:articleId", async (req, res) => {
     res.status(200).json(oneArticleInDB);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ errorMessage: "Trouble finding all the articles" });
+    res.status(500).json({ errorMessage: "Trouble finding one article" });
   }
 });
 
 //update the article title
-router.patch("/update-article/:articleId", (req, res) => {
-  ArticleModel.findByIdAndUpdate(req.params.articleId, req.body, { new: true })
+router.patch("/update-article/:articleId", uploader.single("image"), (req, res) => {
+  if (req.file) {
+    ArticleModel.findByIdAndUpdate(req.params.articleId, {...req.body, image: req.file.path}, { new: true })
     //.populate("owner")
     .then((updatedArticle) => {
       console.log("article updated", updatedArticle);
@@ -53,6 +55,18 @@ router.patch("/update-article/:articleId", (req, res) => {
       console.log(err);
       res.status(500).json({ errorMessage: "Trouble finding all the articles" });
     });
+  } else {
+    ArticleModel.findByIdAndUpdate(req.params.articleId, {...req.body}, { new: true })
+      //.populate("owner")
+      .then((updatedArticle) => {
+        console.log("article updated", updatedArticle);
+        res.status(200).json(updatedArticle);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({ errorMessage: "Trouble finding all the articles" });
+      });
+  }
 });
 
 //delete a article
