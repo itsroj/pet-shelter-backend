@@ -1,11 +1,11 @@
 const router = require("express").Router();
 const PetModel = require("../models/Pet.model");
-const uploader = require("../middlewares/cloudinary.middleware")
+const uploader = require("../middlewares/cloudinary.middleware");
 
 //post to create a pet
 router.post("/create", uploader.single("image"), async (req, res) => {
-  console.log("create pet req.body:", req.body)
-  PetModel.create({...req.body, image: req.file.path})
+  console.log("create pet req.body:", req.body);
+  PetModel.create({ ...req.body, image: req.file.path })
     .then((responseFromDB) => {
       console.log("pet created!", responseFromDB);
       res.status(201).json(responseFromDB);
@@ -18,7 +18,8 @@ router.post("/create", uploader.single("image"), async (req, res) => {
 
 //route to get all pets
 router.get("/all-pets", async (req, res) => {
-  PetModel.find().populate("createdBy")
+  PetModel.find()
+    .populate("createdBy")
     // .populate("owner")
     .then((responseFromDB) => {
       // console.log("Here are all the pets", responseFromDB);
@@ -45,18 +46,22 @@ router.get("/one-pet/:petId", async (req, res) => {
 
 //update the pet title
 router.patch("/update-pet/:petId", uploader.single("image"), (req, res) => {
-  console.log(req.file)
+  console.log(req.file);
   if (req.file) {
-    PetModel.findByIdAndUpdate(req.params.petId, {...req.body, image:req.file.path}, { new: true })
-    //.populate("owner")
-    .then((updatedPet) => {
-      console.log("pet updated", updatedPet);
-      res.status(200).json(updatedPet);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({ errorMessage: "Trouble finding all the pets" });
-    });
+    PetModel.findByIdAndUpdate(
+      req.params.petId,
+      { ...req.body, image: req.file.path },
+      { new: true }
+    )
+      //.populate("owner")
+      .then((updatedPet) => {
+        console.log("pet updated", updatedPet);
+        res.status(200).json(updatedPet);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({ errorMessage: "Trouble finding all the pets" });
+      });
   } else {
     PetModel.findByIdAndUpdate(req.params.petId, req.body, { new: true })
       //.populate("owner")

@@ -1,10 +1,10 @@
 const router = require("express").Router();
 const ArticleModel = require("../models/Article.model");
-const uploader = require("../middlewares/cloudinary.middleware")
+const uploader = require("../middlewares/cloudinary.middleware");
 
 //post to create a article
 router.post("/create", uploader.single("image"), async (req, res) => {
-  ArticleModel.create({...req.body, image: req.file.path})
+  ArticleModel.create({ ...req.body, image: req.file.path })
     .then((responseFromDB) => {
       console.log("article created!", responseFromDB);
       res.status(201).json(responseFromDB);
@@ -27,7 +27,9 @@ router.get("/all-articles", async (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).json({ errorMessage: "Trouble finding all the articles" });
+      res
+        .status(500)
+        .json({ errorMessage: "Trouble finding all the articles" });
     });
 });
 
@@ -43,31 +45,47 @@ router.get("/one-article/:articleId", async (req, res) => {
 });
 
 //update the article title
-router.patch("/update-article/:articleId", uploader.single("image"), (req, res) => {
-  if (req.file) {
-    ArticleModel.findByIdAndUpdate(req.params.articleId, {...req.body, image: req.file.path}, { new: true })
-    //.populate("owner")
-    .then((updatedArticle) => {
-      console.log("article updated", updatedArticle);
-      res.status(200).json(updatedArticle);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({ errorMessage: "Trouble finding all the articles" });
-    });
-  } else {
-    ArticleModel.findByIdAndUpdate(req.params.articleId, {...req.body}, { new: true })
-      //.populate("owner")
-      .then((updatedArticle) => {
-        console.log("article updated", updatedArticle);
-        res.status(200).json(updatedArticle);
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json({ errorMessage: "Trouble finding all the articles" });
-      });
+router.patch(
+  "/update-article/:articleId",
+  uploader.single("image"),
+  (req, res) => {
+    if (req.file) {
+      ArticleModel.findByIdAndUpdate(
+        req.params.articleId,
+        { ...req.body, image: req.file.path },
+        { new: true }
+      )
+        //.populate("owner")
+        .then((updatedArticle) => {
+          console.log("article updated", updatedArticle);
+          res.status(200).json(updatedArticle);
+        })
+        .catch((err) => {
+          console.log(err);
+          res
+            .status(500)
+            .json({ errorMessage: "Trouble finding all the articles" });
+        });
+    } else {
+      ArticleModel.findByIdAndUpdate(
+        req.params.articleId,
+        { ...req.body },
+        { new: true }
+      )
+        //.populate("owner")
+        .then((updatedArticle) => {
+          console.log("article updated", updatedArticle);
+          res.status(200).json(updatedArticle);
+        })
+        .catch((err) => {
+          console.log(err);
+          res
+            .status(500)
+            .json({ errorMessage: "Trouble finding all the articles" });
+        });
+    }
   }
-});
+);
 
 //delete a article
 router.delete("/delete-article/:articleId", async (req, res) => {
