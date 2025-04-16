@@ -1,4 +1,4 @@
-# 🐾 Animal Shelter Web App
+# 🐾 Once Upon a Paw (Animal Shelter Web App)
 
 A modern full-stack web application designed to manage an animal shelter's content and community interactions. The app provides a user-friendly interface for both visitors and administrators, with clear separation of roles and a responsive design.
 
