@@ -67,8 +67,31 @@ router.post("/login", async (req, res) => {
 
 //this route checks if the token is present and valid
 router.get("/verify", isAuthenticated, async (req, res) => {
-  console.log("here in the verify route");
-  res.status(200).json({ message: "Token valid", payload: req.payload });
+  try {
+    // console.log("here in the verify route");
+    
+    // Get user ID from the token payload
+    const userId = req.payload._id;
+    
+    // Fetch the complete user data from database (except password)
+    const currentUser = await UserModel.findById(userId).select("-password");
+    
+    if (!currentUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    // Return token validity confirmation and user data including profile image
+    res.status(200).json({ 
+      message: "Token valid", 
+      payload: {
+        ...req.payload,
+        profileImage: currentUser.profileImage
+      }
+    });
+  } catch (error) {
+    // console.log("Error in verify route:", error);
+    res.status(500).json({ message: "Server error in verify route" });
+  }
 });
 
 module.exports = router;

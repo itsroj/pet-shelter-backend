@@ -6,8 +6,11 @@ const uploader = require("../middlewares/cloudinary.middleware");
 router.post("/create", uploader.single("image"), async (req, res) => {
   ArticleModel.create({ ...req.body, image: req.file.path })
     .then((responseFromDB) => {
-      console.log("article created!", responseFromDB);
-      res.status(201).json(responseFromDB);
+      // console.log("article created!", responseFromDB);
+      return ArticleModel.findById(responseFromDB._id).populate("author")
+    })
+    .then((foundArticle) => {
+      res.status(201).json(foundArticle);
     })
     .catch((err) => {
       console.log(err);
