@@ -51,6 +51,7 @@ router.post("/login", async (req, res) => {
           _id: foundUser._id,
           username: foundUser.username,
           role: foundUser.role,
+          profileImage: foundUser.profileImage
         };
         const authToken = jwt.sign(data, process.env.TOKEN_SECRET, {
           algorithm: "HS256",
